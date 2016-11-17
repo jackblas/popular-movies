@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Popular Movies App</string>
+    
+    <string name="title_popular_movies">Popular Movies</string>
+    <string name="title_top_rated_movies">Highest Rated Movies</string>
+
+    <string name="title_activity_detail">Movie Detail</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Menu strings -->
+    <string name="action_settings">Settings</string>
+
+    <!-- Preferences -->
+    <string name="pref_sort_by_label">Sort By</string>
+
+    <string name="pref_sort_popular_label">Most Popular</string>
+    <string name="pref_sort_rated_label">Highest-Rated</string>
+
+    <string name="pref_sort_by_key">sort_by</string>
+    <string name="pref_sort_by_popular">popular</string>
+    <string name="pref_sort_by_rated">rated</string>
+
+
+    <!-- Accessibility strings -->
+    <string name="movie_poster">Movie Poster</string>
+
+    <!-- Detail Fragment strings -->
+    <string name="original_title">Original Title</string>
+    <string name="overview">Overview</string>
+    <string name="user_rating">User Rating</string>
+    <string name="release_date">Release Date</string>
+
+    <!-- Dialogs -->
+    <string name="no_connection_alert_title">No Network Connection!</string>
+    <string name="no_connection_alert_message_one">Movie list not loaded due to network connection issues.</string>
+    <string name="no_connection_alert_message_two">Poster image not loaded due to network connection issues.</string>
+
+    <string name="no_data_alert_title">Alert!</string>
+    <string name="no_data_alert_message">Unable to parse data from the server.</string>
+
+
+</resources>
