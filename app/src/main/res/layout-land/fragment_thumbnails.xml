@@ -6,7 +6,7 @@
     <GridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="5"
+        android:numColumns="4"
         android:stretchMode="columnWidth"
         android:gravity="center"
         android:id="@+id/thumbnails_grid"/>

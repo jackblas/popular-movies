@@ -1,26 +1,19 @@
 package com.example.android.popularmovies;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ListView;
 
-import com.squareup.picasso.Picasso;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.example.android.popularmovies.data.MovieProvider;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,7 +23,7 @@ import java.util.Locale;
  * Use the {@link DetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -43,21 +36,23 @@ public class DetailFragment extends Fragment {
     /*
      * Class variables
      */
-    private static final String LOG_TAG = ThumbnailsFragment.class.getSimpleName();
-    // Package name used as qualifier in keys for extras to prevent name collision with extras from other apps:
-    private static final String EXTRA_ORIGINAL_TITLE = "com.example.android.popularmovies.original_title";
-    private static final String EXTRA_OVERVIEW = "com.example.android.popularmovies.overview";
-    private static final String EXTRA_USER_RATING = "com.example.android.popularmovies.user_rating";
-    private static final String EXTRA_RELEASE_DATE = "com.example.android.popularmovies.release_date";
-    private static final String EXTRA_POSTER_PATH = "com.example.android.popularmovies.poster_path";
+    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
-    private static final String BASE_URL_IMAGES_W500 = "http://image.tmdb.org/t/p/w500/";
-    private static final String DATE_PATTERN = "yyyy-MM-dd";
+    private static final int DETAIL_LOADER = 0;
+
+    private static final String DETAILS_KEY = "saved_indices";
 
     /*
      * Instance variables
      */
     private OnFragmentInteractionListener mListener;
+    static final String DETAILS_URI = "URI";
+
+    private DetailsAdapter mDetailsAdapter;
+    private ListView mListView;
+
+    Uri mUri;
+
 
     public DetailFragment() {
         // Required empty public constructor
@@ -107,55 +102,33 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(DetailFragment.DETAILS_URI);
+        }
+
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_detail, container, false);
 
-        // Get extras:
-        Intent intent = getActivity().getIntent();
-        if (intent != null) {
-            if(intent.hasExtra(EXTRA_POSTER_PATH)) {
-                String posterPath = intent.getStringExtra(EXTRA_POSTER_PATH);
-                ImageView imageView = (ImageView) rootView.findViewById(R.id.poster_image_detail);
-                ImageView imageViewBg = (ImageView) rootView.findViewById(R.id.poster_image_detail_bg);
+        // Get a reference to the ListView, and attach this adapter to it.
+        mListView = (ListView) rootView.findViewById(R.id.listview_details);
 
-                if(isOnline()) {
-                    // Fetch the image
-                    Picasso.with(getContext()).load(BASE_URL_IMAGES_W500 + posterPath).into(imageViewBg);
-                    Picasso.with(getContext()).load(BASE_URL_IMAGES_W500 + posterPath).into(imageView);
-                } else {
-                    // Show alert
-                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
-                    alertBuilder.setTitle(R.string.no_connection_alert_title);
-                    alertBuilder.setMessage(R.string.no_connection_alert_message_two);
-                    alertBuilder.setPositiveButton(android.R.string.ok, null);
-                    alertBuilder.create().show();
-                }
-            }
-            if(intent.hasExtra(EXTRA_OVERVIEW)){
-                String overviewString = intent.getStringExtra(EXTRA_OVERVIEW);
-                TextView textView = (TextView) rootView.findViewById(R.id.overview);
-                textView.setText(overviewString);
-            }
-            if(intent.hasExtra(EXTRA_ORIGINAL_TITLE)){
-                String title = intent.getStringExtra(EXTRA_ORIGINAL_TITLE);
-                TextView textView = (TextView) rootView.findViewById(R.id.original_title_detail);
-                textView.setText(title);
-            }
-            if(intent.hasExtra(EXTRA_USER_RATING)){
-                String rating = intent.getStringExtra(EXTRA_USER_RATING);
-                TextView textView = (TextView) rootView.findViewById(R.id.user_rating);
-                textView.setText(rating);
-            }
-            if(intent.hasExtra(EXTRA_RELEASE_DATE)){
-                String releaseDate = intent.getStringExtra(EXTRA_RELEASE_DATE);
-                TextView textView = (TextView) rootView.findViewById(R.id.release_date);
-                textView.setText(formatDate(releaseDate, DATE_PATTERN));
-            }
+        if(savedInstanceState !=null && savedInstanceState.containsKey(DETAILS_KEY)){
+            String[] values = savedInstanceState.getStringArray(DETAILS_KEY);
 
+            mDetailsAdapter = new DetailsAdapter(getActivity(),null,0);
+            mDetailsAdapter.setValues(values);
+
+        } else {
+            mDetailsAdapter = new DetailsAdapter(getActivity(),null,0);
         }
+
+        mListView.setAdapter(mDetailsAdapter);
 
         return rootView;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -164,21 +137,16 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     /**
@@ -196,38 +164,54 @@ public class DetailFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-    /**
-     * This utility method check to see whether a network connection is available
-     * before the app attempts to connect to the network.
-     *
-     */
-    private boolean isOnline() {
+        String[] values = mDetailsAdapter.getValues();
+        // Save Favorite Flag, first trailer index, and first review index
+        // Favorite Flag determines Favorite button's text.
+        // First Trailer and review indices determine when to show Trailers and Reviews headers
+        outState.putStringArray(DETAILS_KEY, values);
 
-        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 
-    /**
-     * This utility functions formats date string to a default locale style.
-     * @param dateStrIn Date string
-     * @param pattern   Date pattern
-     * @return Localized date string
-     */
-    private String formatDate(String dateStrIn, String pattern){
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
 
-        SimpleDateFormat oldFormat = new SimpleDateFormat(pattern);
-        DateFormat newFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT, Locale.getDefault());
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        String dateStrOut = dateStrIn;
-        try {
-            Date date = oldFormat.parse(dateStrIn);
-            dateStrOut = newFormat.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(mUri != null ){
+            return new CursorLoader(
+                    getActivity(),
+                    //intent.getData(),
+                    mUri,
+                    //Since MatrixCursor is created in MovieProvider
+                    //the projection is defined there rather than in DetailFragment
+                    MovieProvider.MTRX_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
         }
 
-        return dateStrOut;
+        return null;
     }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mDetailsAdapter.swapCursor(data);
+        //Log.d(LOG_TAG, "DUMP: " + DatabaseUtils.dumpCursorToString(data));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mDetailsAdapter.swapCursor(null);
+
+    }
+
 }

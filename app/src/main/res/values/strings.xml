@@ -1,10 +1,11 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Popular Movies App</string>
     
     <string name="title_popular_movies">Popular Movies</string>
     <string name="title_top_rated_movies">Highest Rated Movies</string>
+    <string name="title_favorite_movies">My Favorite Movies</string>
 
-    <string name="title_activity_detail">Movie Detail</string>
+    <string name="title_activity_detail">Movie Details</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Menu strings -->
@@ -15,28 +16,58 @@
 
     <string name="pref_sort_popular_label">Most Popular</string>
     <string name="pref_sort_rated_label">Highest-Rated</string>
+    <string name="pref_sort_favorite_label">Favorite Only</string>
 
     <string name="pref_sort_by_key">sort_by</string>
     <string name="pref_sort_by_popular">popular</string>
     <string name="pref_sort_by_rated">rated</string>
+    <string name="pref_sort_by_favorite">favorite</string>
 
+
+    <!-- Strings related to Favorites preference -->
+    <string name="pref_show_favorites_key" translatable="false">show_favorites</string>
+    <string name="pref_show_favorites_label">Show Favorite Movies Only</string>
+
+    <string name="pref_show_favorites_true">Yes</string>
+    <string name="pref_show_favorites_false">No</string>
+    <string name="pref_show_favorites_default" translatable="false">false</string>
 
     <!-- Accessibility strings -->
     <string name="movie_poster">Movie Poster</string>
 
-    <!-- Detail Fragment strings -->
+    <!-- Details Fragment strings -->
     <string name="original_title">Original Title</string>
     <string name="overview">Overview</string>
     <string name="user_rating">User Rating</string>
     <string name="release_date">Release Date</string>
+    <string name="trailers">Trailers:</string>
+    <string name="reviews">Reviews:</string>
+
+    <string name="review_by">Review by </string>
+
+    <string name="mark_button_text">Mark as\nfavorite</string>
+    <string name="remove_button_text">Remove from\nfavorites</string>
+
+    <!-- Toasts messages -->
+    <string name="add_to_favotites_toast">Movie added to Favorites.</string>
+    <string name="remove_from_favotites_toast">Movie removed from Favorites.</string>
+
+    <!-- Details Fragment strings format -->
+    <string name="format_runtime"><xliff:g id="runtime">%1$s</xliff:g>min</string>
+    <string name="format_rating">%1$s/10</string>
+
 
     <!-- Dialogs -->
     <string name="no_connection_alert_title">No Network Connection!</string>
-    <string name="no_connection_alert_message_one">Movie list not loaded due to network connection issues.</string>
+    <string name="no_connection_alert_message_one">Data not loaded due to network connection issues.</string>
     <string name="no_connection_alert_message_two">Poster image not loaded due to network connection issues.</string>
+    <string name="no_connection_alert_message_three">Not available due to network connection issues.</string>
 
     <string name="no_data_alert_title">Alert!</string>
     <string name="no_data_alert_message">Unable to parse data from the server.</string>
+
+    <!-- Content Provider related -->
+    <string name="content_authority">com.example.android.popularmovies</string>
 
 
 </resources>
